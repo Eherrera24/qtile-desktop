@@ -20,6 +20,17 @@ MacWidgets appear on empty workspaces.
 |---|---|
 | ![Rofi](assets/screenshots/rofi.png) | ![Kitty](assets/screenshots/terminal.png) |
 
+### Desktop widgets
+
+MacWidgets uses translucent GTK cards and is automatically shown on empty
+workspaces, then hidden by Qtile when an application window appears.
+
+<p align="center">
+  <a href="assets/screenshots/desktop/widgets.png">
+    <img src="assets/screenshots/desktop/widgets.png" alt="Complete desktop with clock and calendar MacWidgets" width="900">
+  </a>
+</p>
+
 <details>
 <summary><strong>Terminal showcase — Htop, Ranger and Btop</strong></summary>
 <br>
@@ -40,7 +51,7 @@ The groups use identical layouts and controls; wallpaper and palette are the
 intentional differences. The gallery stays collapsed by default so it does not
 overwhelm the project page.
 
-<details>
+<details open>
 <summary><strong>Open the complete nine-workspace gallery</strong></summary>
 <br>
 

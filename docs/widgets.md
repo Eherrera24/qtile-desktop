@@ -21,3 +21,11 @@ registered so the workspace palette can update them live.
 
 The secondary-monitor bar keeps GroupBox, WindowName, CurrentLayout and Clock.
 `Systray` is present only as commented code and is therefore not active.
+
+## Desktop MacWidgets
+
+The custom GTK layer currently enables two translucent desktop cards: a large
+stacked digital clock and a monthly calendar. Both use scale 1.6 and opacity
+0.35, positioned at the upper left through stored per-widget geometry. Qtile's
+`widget_visibility.py` sends `show` on an empty group and `hide` when a normal
+application window is present. See the [complete capture](../assets/screenshots/desktop/widgets.png).
