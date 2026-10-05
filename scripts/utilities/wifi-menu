@@ -1,0 +1,184 @@
+#!/bin/sh
+
+interface='wlan0'
+iwctl='/usr/bin/iwctl'
+rofi='/usr/bin/rofi'
+
+export LC_ALL=C
+
+state_dir=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/wifi-menu.XXXXXX") || exit 1
+networks_file="$state_dir/networks"
+known_file="$state_dir/known"
+menu_file="$state_dir/menu"
+
+cleanup() {
+    rm -f "$networks_file" "$known_file" "$menu_file"
+    rmdir "$state_dir" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+strip_ansi() {
+    sed 's/\x1b\[[0-9;]*m//g'
+}
+
+message() {
+    "$rofi" -e "$1"
+}
+
+interface_exists() {
+    "$iwctl" station "$interface" show >/dev/null 2>&1
+}
+
+current_network() {
+    "$iwctl" station "$interface" show 2>/dev/null |
+        strip_ansi |
+        awk '/Connected network/ {
+            sub(/^.*Connected network[[:space:]]+/, "")
+            sub(/[[:space:]]+$/, "")
+            print
+            exit
+        }'
+}
+
+load_known() {
+    "$iwctl" known-networks list 2>/dev/null |
+        strip_ansi |
+        awk '
+            match($0, /[[:space:]]+(open|psk|8021x|owe|sae)[[:space:]]+/) {
+                name = substr($0, 1, RSTART - 1)
+                sub(/^[[:space:]]+/, "", name)
+                sub(/[[:space:]]+$/, "", name)
+                if (name != "") print name
+            }
+        ' > "$known_file"
+}
+
+load_networks() {
+    "$iwctl" station "$interface" get-networks 2>/dev/null |
+        strip_ansi |
+        awk '
+            match($0, /[[:space:]]+(open|psk|8021x|owe|sae)[[:space:]]+/) {
+                name = substr($0, 1, RSTART - 1)
+                security = substr($0, RSTART, RLENGTH)
+                sub(/^[[:space:]>]+/, "", name)
+                sub(/[[:space:]]+$/, "", name)
+                gsub(/[[:space:]]/, "", security)
+                if (name != "") print name "\t" security
+            }
+        ' > "$networks_file"
+}
+
+build_menu() {
+    connected=$(current_network)
+    : > "$menu_file"
+
+    if [ -n "$connected" ]; then
+        printf 'Conectada: %s\n' "$connected" >> "$menu_file"
+    else
+        printf 'Sin conexión\n' >> "$menu_file"
+    fi
+
+    printf 'Actualizar redes\n' >> "$menu_file"
+    [ -n "$connected" ] && printf 'Desconectar\n' >> "$menu_file"
+    printf 'Cancelar\n' >> "$menu_file"
+
+    number=1
+    while IFS="$(printf '\t')" read -r ssid security; do
+        [ -n "$ssid" ] || continue
+        if grep -Fqx -- "$ssid" "$known_file"; then
+            label='conocida'
+        else
+            label=$security
+        fi
+        printf '%s. %s  [%s]\n' "$number" "$ssid" "$label" >> "$menu_file"
+        number=$((number + 1))
+    done < "$networks_file"
+}
+
+connect_network() {
+    ssid=$1
+    security=$2
+
+    if grep -Fqx -- "$ssid" "$known_file" || [ "$security" = open ]; then
+        result=$("$iwctl" station "$interface" connect "$ssid" 2>&1)
+        status=$?
+        if [ "$status" -ne 0 ]; then
+            message "No se pudo conectar a $ssid.\n$(printf '%s' "$result" | strip_ansi)"
+        fi
+        return
+    fi
+
+    action=$(printf '%s\n' 'Abrir terminal con iwctl' 'Volver' |
+        "$rofi" -dmenu -i -p 'Autenticación requerida') || return
+
+    if [ "$action" = 'Abrir terminal con iwctl' ]; then
+        if [ -x /usr/bin/kitty ]; then
+            /usr/bin/kitty --title "Wi-Fi: $ssid" \
+                "$iwctl" station "$interface" connect "$ssid" &
+        else
+            message 'No se encontró una terminal compatible.'
+        fi
+    fi
+}
+
+if ! interface_exists; then
+    message "No se encontró la interfaz $interface."
+    exit 1
+fi
+
+load_known
+load_networks
+build_menu
+
+if [ "${1-}" = '--list' ]; then
+    cat "$menu_file"
+    exit 0
+fi
+
+if [ "$#" -ne 0 ]; then
+    echo "Uso: wifi-menu [--list]" >&2
+    exit 2
+fi
+
+while true; do
+    choice=$("$rofi" -dmenu -i -p 'Wi-Fi' < "$menu_file") || exit 0
+    grep -Fqx -- "$choice" "$menu_file" || continue
+
+    case "$choice" in
+        'Conectada: '*|'Sin conexión')
+            continue
+            ;;
+        'Actualizar redes')
+            if ! "$iwctl" station "$interface" scan >/dev/null 2>&1; then
+                message 'No se pudo iniciar el escaneo.'
+            else
+                sleep 2
+            fi
+            ;;
+        'Desconectar')
+            result=$("$iwctl" station "$interface" disconnect 2>&1)
+            status=$?
+            if [ "$status" -ne 0 ]; then
+                message "No se pudo desconectar.\n$(printf '%s' "$result" | strip_ansi)"
+            fi
+            ;;
+        'Cancelar')
+            exit 0
+            ;;
+        [0-9]*'. '*)
+            number=${choice%%.*}
+            entry=$(sed -n "${number}p" "$networks_file")
+            ssid=${entry%%$(printf '\t')*}
+            security=${entry#*$(printf '\t')}
+            [ -n "$ssid" ] && connect_network "$ssid" "$security"
+            ;;
+        *)
+            continue
+            ;;
+    esac
+
+    load_known
+    load_networks
+    build_menu
+done

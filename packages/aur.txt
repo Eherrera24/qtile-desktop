@@ -1,0 +1,5 @@
+# Installed as a foreign package on the audited machine
+plank-reloaded-git
+
+# Installed in ~/.local with pip (not an AUR package)
+# qtile-extras==0.35.0

@@ -1,0 +1,2 @@
+# Active configuration snapshots are kept byte-for-byte identical to source.
+config/** whitespace=-blank-at-eof,-trailing-space

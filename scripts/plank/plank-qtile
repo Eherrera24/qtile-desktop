@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+WM_CLASS="$1"
+shift
+
+CURRENT_GROUP="$(
+  qtile cmd-obj -o group -f info |
+  python -c 'import sys,ast; print(ast.literal_eval(sys.stdin.read())["name"])'
+)"
+
+WINDOW_ID="$(
+  qtile cmd-obj -o cmd -f windows |
+  python -c '
+import sys, ast
+
+wm_class = sys.argv[1].lower()
+group = sys.argv[2]
+
+windows = ast.literal_eval(sys.stdin.read())
+
+for w in windows:
+    classes = [str(x).lower() for x in (w.get("wm_class") or [])]
+
+    if w.get("group") == group and wm_class in classes:
+        print(w["id"])
+        break
+' "$WM_CLASS" "$CURRENT_GROUP"
+)"
+
+if [ -n "$WINDOW_ID" ]; then
+    qtile cmd-obj -o window "$WINDOW_ID" -f focus
+else
+    exec "$@"
+fi

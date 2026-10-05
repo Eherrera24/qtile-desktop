@@ -1,0 +1,515 @@
+{
+  "I": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/I.png",
+    "palette": {
+      "dark": [
+        "#0b0b0a",
+        "#0b0b0a"
+      ],
+      "grey": [
+        "#00537e",
+        "#00537e"
+      ],
+      "light": [
+        "#d9c28b",
+        "#d9c28b"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#ab9a73",
+        "#ab9a73"
+      ],
+      "active": [
+        "#d9c28b",
+        "#d9c28b"
+      ],
+      "inactive": [
+        "#08719f",
+        "#08719f"
+      ],
+      "urgent": [
+        "#3e3b34",
+        "#3e3b34"
+      ],
+      "color1": [
+        "#00537e",
+        "#00537e"
+      ],
+      "color2": [
+        "#01608e",
+        "#01608e"
+      ],
+      "color3": [
+        "#08719f",
+        "#08719f"
+      ],
+      "color4": [
+        "#1384af",
+        "#1384af"
+      ],
+      "color5": [
+        "#ab9a73",
+        "#ab9a73"
+      ]
+    }
+  },
+  "II": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/II.png",
+    "palette": {
+      "dark": [
+        "#182322",
+        "#182322"
+      ],
+      "grey": [
+        "#4a6155",
+        "#4a6155"
+      ],
+      "light": [
+        "#e2dbaf",
+        "#e2dbaf"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#aaaa80",
+        "#aaaa80"
+      ],
+      "active": [
+        "#e2dbaf",
+        "#e2dbaf"
+      ],
+      "inactive": [
+        "#d0612d",
+        "#d0612d"
+      ],
+      "urgent": [
+        "#393e34",
+        "#393e34"
+      ],
+      "color1": [
+        "#4a6155",
+        "#4a6155"
+      ],
+      "color2": [
+        "#6d7c68",
+        "#6d7c68"
+      ],
+      "color3": [
+        "#d0612d",
+        "#d0612d"
+      ],
+      "color4": [
+        "#4b929d",
+        "#4b929d"
+      ],
+      "color5": [
+        "#aaaa80",
+        "#aaaa80"
+      ]
+    }
+  },
+  "III": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/III.png",
+    "palette": {
+      "dark": [
+        "#052f45",
+        "#052f45"
+      ],
+      "grey": [
+        "#734134",
+        "#734134"
+      ],
+      "light": [
+        "#d4ccae",
+        "#d4ccae"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#9e9985",
+        "#9e9985"
+      ],
+      "active": [
+        "#d4ccae",
+        "#d4ccae"
+      ],
+      "inactive": [
+        "#4c7076",
+        "#4c7076"
+      ],
+      "urgent": [
+        "#13495e",
+        "#13495e"
+      ],
+      "color1": [
+        "#734134",
+        "#734134"
+      ],
+      "color2": [
+        "#286c7f",
+        "#286c7f"
+      ],
+      "color3": [
+        "#4c7076",
+        "#4c7076"
+      ],
+      "color4": [
+        "#618c94",
+        "#618c94"
+      ],
+      "color5": [
+        "#9e9985",
+        "#9e9985"
+      ]
+    }
+  },
+  "IV": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/IV.png",
+    "palette": {
+      "dark": [
+        "#312a2c",
+        "#312a2c"
+      ],
+      "grey": [
+        "#4f3b6f",
+        "#4f3b6f"
+      ],
+      "light": [
+        "#c7b09f",
+        "#c7b09f"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#ad5e79",
+        "#ad5e79"
+      ],
+      "active": [
+        "#c7b09f",
+        "#c7b09f"
+      ],
+      "inactive": [
+        "#7a4479",
+        "#7a4479"
+      ],
+      "urgent": [
+        "#2e325d",
+        "#2e325d"
+      ],
+      "color1": [
+        "#4f3b6f",
+        "#4f3b6f"
+      ],
+      "color2": [
+        "#465590",
+        "#465590"
+      ],
+      "color3": [
+        "#7a4479",
+        "#7a4479"
+      ],
+      "color4": [
+        "#7a5634",
+        "#7a5634"
+      ],
+      "color5": [
+        "#ad5e79",
+        "#ad5e79"
+      ]
+    }
+  },
+  "V": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/V.jpg",
+    "palette": {
+      "dark": [
+        "#020e2e",
+        "#020e2e"
+      ],
+      "grey": [
+        "#06245a",
+        "#06245a"
+      ],
+      "light": [
+        "#e75344",
+        "#e75344"
+      ],
+      "text": [
+        "#FFFFFF",
+        "#FFFFFF"
+      ],
+      "focus": [
+        "#5b82c0",
+        "#5b82c0"
+      ],
+      "active": [
+        "#e75344",
+        "#e75344"
+      ],
+      "inactive": [
+        "#814058",
+        "#814058"
+      ],
+      "urgent": [
+        "#031740",
+        "#031740"
+      ],
+      "color1": [
+        "#06245a",
+        "#06245a"
+      ],
+      "color2": [
+        "#2c325f",
+        "#2c325f"
+      ],
+      "color3": [
+        "#814058",
+        "#814058"
+      ],
+      "color4": [
+        "#4172a5",
+        "#4172a5"
+      ],
+      "color5": [
+        "#5b82c0",
+        "#5b82c0"
+      ]
+    }
+  },
+  "VIII": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/VIII.jpg",
+    "palette": {
+      "dark": [
+        "#0c233d",
+        "#0c233d"
+      ],
+      "grey": [
+        "#6d3932",
+        "#6d3932"
+      ],
+      "light": [
+        "#d3b69f",
+        "#d3b69f"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#78aabe",
+        "#78aabe"
+      ],
+      "active": [
+        "#d3b69f",
+        "#d3b69f"
+      ],
+      "inactive": [
+        "#5f5f6f",
+        "#5f5f6f"
+      ],
+      "urgent": [
+        "#093f83",
+        "#093f83"
+      ],
+      "color1": [
+        "#6d3932",
+        "#6d3932"
+      ],
+      "color2": [
+        "#236eae",
+        "#236eae"
+      ],
+      "color3": [
+        "#5f5f6f",
+        "#5f5f6f"
+      ],
+      "color4": [
+        "#c85839",
+        "#c85839"
+      ],
+      "color5": [
+        "#78aabe",
+        "#78aabe"
+      ]
+    }
+  },
+  "VI": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/VI.png",
+    "palette": {
+      "dark": [
+        "#060c18",
+        "#060c18"
+      ],
+      "grey": [
+        "#0f263b",
+        "#0f263b"
+      ],
+      "light": [
+        "#d5ccae",
+        "#d5ccae"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#a8a594",
+        "#a8a594"
+      ],
+      "active": [
+        "#d5ccae",
+        "#d5ccae"
+      ],
+      "inactive": [
+        "#953835",
+        "#953835"
+      ],
+      "urgent": [
+        "#071b2e",
+        "#071b2e"
+      ],
+      "color1": [
+        "#0f263b",
+        "#0f263b"
+      ],
+      "color2": [
+        "#42363b",
+        "#42363b"
+      ],
+      "color3": [
+        "#953835",
+        "#953835"
+      ],
+      "color4": [
+        "#666b67",
+        "#666b67"
+      ],
+      "color5": [
+        "#a8a594",
+        "#a8a594"
+      ]
+    }
+  },
+  "VII": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/VII.png",
+    "palette": {
+      "dark": [
+        "#162b22",
+        "#162b22"
+      ],
+      "grey": [
+        "#2f5842",
+        "#2f5842"
+      ],
+      "light": [
+        "#b8d49e",
+        "#b8d49e"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#99c090",
+        "#99c090"
+      ],
+      "active": [
+        "#b8d49e",
+        "#b8d49e"
+      ],
+      "inactive": [
+        "#619275",
+        "#619275"
+      ],
+      "urgent": [
+        "#204232",
+        "#204232"
+      ],
+      "color1": [
+        "#2f5842",
+        "#2f5842"
+      ],
+      "color2": [
+        "#49785f",
+        "#49785f"
+      ],
+      "color3": [
+        "#619275",
+        "#619275"
+      ],
+      "color4": [
+        "#7baa87",
+        "#7baa87"
+      ],
+      "color5": [
+        "#99c090",
+        "#99c090"
+      ]
+    }
+  },
+  "IX": {
+    "wallpaper": "/home/esteban/.config/qtile/workspace-wallpapers/IX.png",
+    "palette": {
+      "dark": [
+        "#1c1514",
+        "#1c1514"
+      ],
+      "grey": [
+        "#60392c",
+        "#60392c"
+      ],
+      "light": [
+        "#cfbc92",
+        "#cfbc92"
+      ],
+      "text": [
+        "#000000",
+        "#000000"
+      ],
+      "focus": [
+        "#85a989",
+        "#85a989"
+      ],
+      "active": [
+        "#cfbc92",
+        "#cfbc92"
+      ],
+      "inactive": [
+        "#4b8e7b",
+        "#4b8e7b"
+      ],
+      "urgent": [
+        "#263127",
+        "#263127"
+      ],
+      "color1": [
+        "#60392c",
+        "#60392c"
+      ],
+      "color2": [
+        "#8f4d39",
+        "#8f4d39"
+      ],
+      "color3": [
+        "#4b8e7b",
+        "#4b8e7b"
+      ],
+      "color4": [
+        "#609c83",
+        "#609c83"
+      ],
+      "color5": [
+        "#85a989",
+        "#85a989"
+      ]
+    }
+  }
+}

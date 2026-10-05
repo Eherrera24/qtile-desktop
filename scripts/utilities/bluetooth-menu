@@ -1,0 +1,164 @@
+#!/bin/sh
+
+bluetoothctl='/usr/bin/bluetoothctl'
+rofi='/usr/bin/rofi'
+blueman='/usr/bin/blueman-manager'
+
+export LC_ALL=C
+
+state_dir=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/bluetooth-menu.XXXXXX") || exit 1
+devices_file="$state_dir/devices"
+menu_file="$state_dir/menu"
+
+cleanup() {
+    rm -f "$devices_file" "$menu_file"
+    rmdir "$state_dir" 2>/dev/null || true
+}
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+message() {
+    "$rofi" -e "$1"
+}
+
+controller_available() {
+    "$bluetoothctl" show 2>/dev/null |
+        awk '/^[[:space:]]*Powered: yes[[:space:]]*$/ { found=1 } END { exit !found }'
+}
+
+load_devices() {
+    : > "$devices_file"
+
+    "$bluetoothctl" devices Paired 2>/dev/null |
+        while read -r word address name; do
+            [ "$word" = Device ] || continue
+            [ -n "$address" ] && [ -n "$name" ] || continue
+
+            if "$bluetoothctl" info "$address" 2>/dev/null |
+                grep -q '^[[:space:]]*Connected: yes[[:space:]]*$'; then
+                connected=yes
+            else
+                connected=no
+            fi
+
+            printf '%s\t%s\t%s\n' "$address" "$connected" "$name"
+        done > "$devices_file"
+}
+
+build_menu() {
+    : > "$menu_file"
+    number=1
+
+    while IFS="$(printf '\t')" read -r address connected name; do
+        [ -n "$address" ] || continue
+        short_address=$(printf '%s\n' "$address" | cut -d: -f1-3)
+        if [ "$connected" = yes ]; then
+            state='Conectado'
+        else
+            state='Desconectado'
+        fi
+        printf '%s. %s  [%s]  (%s…)\n' \
+            "$number" "$name" "$state" "$short_address" >> "$menu_file"
+        number=$((number + 1))
+    done < "$devices_file"
+
+    [ "$number" -eq 1 ] && printf 'Sin dispositivos emparejados\n' >> "$menu_file"
+    printf 'Buscar / emparejar dispositivo\n' >> "$menu_file"
+    printf 'Abrir Blueman Manager\n' >> "$menu_file"
+    printf 'Cancelar\n' >> "$menu_file"
+}
+
+build_unavailable_menu() {
+    printf '%s\n' \
+        'Bluetooth apagado o no disponible' \
+        'Abrir Blueman Manager' \
+        'Cancelar' > "$menu_file"
+}
+
+open_blueman() {
+    "$blueman" >/dev/null 2>&1 &
+}
+
+if controller_available; then
+    available=yes
+    load_devices
+    build_menu
+else
+    available=no
+    : > "$devices_file"
+    build_unavailable_menu
+fi
+
+if [ "${1-}" = '--list' ]; then
+    cat "$menu_file"
+    exit 0
+fi
+
+if [ "$#" -ne 0 ]; then
+    echo 'Uso: bluetooth-menu [--list]' >&2
+    exit 2
+fi
+
+while true; do
+    choice=$("$rofi" -dmenu -i -p 'Bluetooth' < "$menu_file") || exit 0
+    grep -Fqx -- "$choice" "$menu_file" || continue
+
+    case "$choice" in
+        'Bluetooth apagado o no disponible'|'Sin dispositivos emparejados')
+            continue
+            ;;
+        'Buscar / emparejar dispositivo'|'Abrir Blueman Manager')
+            open_blueman
+            exit 0
+            ;;
+        'Cancelar')
+            exit 0
+            ;;
+        [0-9]*'. '*)
+            [ "$available" = yes ] || continue
+            number=${choice%%.*}
+            entry=$(sed -n "${number}p" "$devices_file")
+            address=${entry%%$(printf '\t')*}
+            remainder=${entry#*$(printf '\t')}
+            connected=${remainder%%$(printf '\t')*}
+            [ -n "$address" ] || continue
+
+            if [ "$connected" = yes ]; then
+                action=$(printf '%s\n' 'Desconectar' 'Cancelar' |
+                    "$rofi" -dmenu -i -p 'Dispositivo conectado') || continue
+            else
+                action=$(printf '%s\n' 'Conectar' 'Cancelar' |
+                    "$rofi" -dmenu -i -p 'Dispositivo desconectado') || continue
+            fi
+
+            case "$action" in
+                'Conectar')
+                    result=$("$bluetoothctl" connect "$address" 2>&1)
+                    status=$?
+                    ;;
+                'Desconectar')
+                    result=$("$bluetoothctl" disconnect "$address" 2>&1)
+                    status=$?
+                    ;;
+                *)
+                    continue
+                    ;;
+            esac
+
+            [ "$status" -eq 0 ] || message "$result"
+            ;;
+        *)
+            continue
+            ;;
+    esac
+
+    if controller_available; then
+        available=yes
+        load_devices
+        build_menu
+    else
+        available=no
+        : > "$devices_file"
+        build_unavailable_menu
+    fi
+done

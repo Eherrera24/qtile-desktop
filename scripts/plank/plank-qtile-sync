@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+from urllib.parse import unquote
+import re
+import shutil
+import subprocess
+
+HOME = Path.home()
+
+DOCK_DIR = HOME / ".config/plank/dock1/launchers"
+APP_DIR = HOME / ".local/share/applications"
+BACKUP_DIR = HOME / ".local/share/plank-qtile-backups"
+HELPER_DIR = HOME / ".local/share/plank-qtile-launchers"
+
+WRAPPER = HOME / ".local/bin/plank-qtile"
+
+APP_DIR.mkdir(parents=True, exist_ok=True)
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+HELPER_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def desktop_value(text, key):
+    inside = False
+
+    for line in text.splitlines():
+        s = line.strip()
+
+        if s == "[Desktop Entry]":
+            inside = True
+            continue
+
+        if inside and s.startswith("["):
+            break
+
+        if inside and line.startswith(key + "="):
+            return line.split("=", 1)[1].strip()
+
+    return None
+
+
+def replace_main_exec(text, command):
+    lines = text.splitlines()
+    result = []
+
+    inside = False
+    replaced = False
+
+    for line in lines:
+        s = line.strip()
+
+        if s == "[Desktop Entry]":
+            inside = True
+            result.append(line)
+            continue
+
+        if inside and s.startswith("["):
+            inside = False
+
+        if inside and line.startswith("Exec=") and not replaced:
+            result.append("Exec=" + command)
+            replaced = True
+        else:
+            result.append(line)
+
+    return "\n".join(result) + "\n"
+
+
+def clean_exec(command):
+    # Quitar placeholders de archivos .desktop
+    command = re.sub(r'(?<!%)%[fFuUdDnNickvm]', '', command)
+    command = command.replace("%%", "%")
+    command = re.sub(r'\s+', ' ', command).strip()
+    return command
+
+
+def get_wm_class(desktop_id, text):
+    wm = desktop_value(text, "StartupWMClass")
+
+    if wm:
+        return wm.strip('"').strip("'")
+
+    name = desktop_id.removesuffix(".desktop")
+
+    # WebApps creadas con WebApps/ICE
+    if name.startswith("WebApp-"):
+        return name
+
+    return name
+
+
+def adapt_command(desktop_id, wm_class, command):
+    low_id = desktop_id.lower()
+    low_class = wm_class.lower()
+
+    # Firefox normal
+    if low_id == "firefox.desktop" or low_class == "firefox":
+        if "--new-window" not in command:
+            command = command.replace(
+                "/usr/lib/firefox/firefox",
+                "firefox --new-window",
+                1
+            )
+
+    # WebApps Firefox / ICE
+    if desktop_id.startswith("WebApp-"):
+        command = command.replace("--no-remote", "")
+
+        if "--new-window" not in command:
+            command = command.replace(
+                "firefox ",
+                "firefox --new-window ",
+                1
+            )
+
+    # VS Code
+    if low_id in ("code.desktop", "visual-studio-code.desktop"):
+        if "--new-window" not in command:
+            command = command.replace(
+                "code ",
+                "code --new-window ",
+                1
+            )
+
+    return re.sub(r'\s+', ' ', command).strip()
+
+
+def process(dockitem):
+    dock_text = dockitem.read_text(errors="ignore")
+
+    match = re.search(
+        r'^Launcher=file://(.+)$',
+        dock_text,
+        re.MULTILINE
+    )
+
+    if not match:
+        return
+
+    launcher = Path(unquote(match.group(1)))
+
+    if launcher.suffix != ".desktop":
+        return
+
+    if not launcher.exists():
+        return
+
+    desktop_id = launcher.name
+
+    # Ignorar nuestros propios launchers ya procesados
+    local_desktop = APP_DIR / desktop_id
+
+    source_text = launcher.read_text(errors="ignore")
+
+    current_exec = desktop_value(source_text, "Exec")
+
+    if not current_exec:
+        return
+
+    # Ya procesado
+    if str(WRAPPER) in current_exec:
+        return
+
+    wm_class = get_wm_class(desktop_id, source_text)
+
+    original_exec = clean_exec(current_exec)
+    original_exec = adapt_command(
+        desktop_id,
+        wm_class,
+        original_exec
+    )
+
+    # Respaldar launcher original una sola vez
+    backup = BACKUP_DIR / desktop_id
+
+    if not backup.exists():
+        shutil.copy2(launcher, backup)
+
+    # Helper para conservar comandos complejos,
+    # incluyendo sh -c de tus WebApps.
+    helper = HELPER_DIR / f"{launcher.stem}.sh"
+
+    helper.write_text(
+        "#!/usr/bin/env bash\n\n"
+        f"exec {original_exec}\n"
+    )
+
+    helper.chmod(0o755)
+
+    new_exec = (
+        f"{WRAPPER} "
+        f"{wm_class} "
+        f"{helper}"
+    )
+
+    new_text = replace_main_exec(
+        source_text,
+        new_exec
+    )
+
+    # Mantener EXACTAMENTE el mismo desktop ID
+    # para evitar el icono duplicado que vimos con Firefox.
+    local_desktop.write_text(new_text)
+
+    # Cambiar solamente el acceso anclado de Plank
+    new_launcher = f"Launcher=file://{local_desktop}"
+
+    dock_text = re.sub(
+        r'^Launcher=file://.+$',
+        new_launcher,
+        dock_text,
+        flags=re.MULTILINE
+    )
+
+    dockitem.write_text(dock_text)
+
+    print(f"Adaptado: {desktop_id} [{wm_class}]")
+
+
+for item in DOCK_DIR.glob("*.dockitem"):
+    try:
+        process(item)
+    except Exception as error:
+        print(f"Error: {item.name}: {error}")
+
+subprocess.run(
+    ["update-desktop-database", str(APP_DIR)],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+)

@@ -1,0 +1,24 @@
+[dock1]
+alignment='center'
+auto-pinning=true
+current-workspace-only=true
+dock-items=['firefox.dockitem', 'WebApp-ChatGpt4154.dockitem', 'WebApp-Chess2767.dockitem', 'WebApp-HackTheBox5128.dockitem', 'homebank.dockitem', 'WebApp-Hacku5658.dockitem', 'WebApp-Whatsapp7270.dockitem', 'burpsuite.dockitem', 'org.gnome.Nautilus.dockitem', 'WebApp-X3030.dockitem', 'WebApp-HBO0181.dockitem', 'WebApp-Pinterest0266.dockitem', 'WebApp-Telegram6582.dockitem']
+hide-delay=0
+hide-mode='intelligent'
+icon-size=56
+items-alignment='center'
+lock-items=false
+monitor=''
+offset=0
+pinned-only=false
+position='bottom'
+pressure-reveal=false
+show-dock-item=false
+theme='Transparent'
+tooltips-enabled=true
+unhide-delay=0
+zoom-enabled=true
+zoom-percent=115
+
+[nombre]
+dock-items=['firefox-3.dockitem', 'firefox-2.dockitem', 'kitty-open.dockitem', 'feh.dockitem', 'firefox.dockitem', 'firefox-1.dockitem', 'nvim.dockitem']

@@ -1,0 +1,10 @@
+# Optional features and utilities detected
+blueman              # graphical Bluetooth manager opened by bluetooth-menu
+dunst                # notification daemon available on the system
+fastfetch            # clean terminal/showcase output
+lightdm              # display manager
+lightdm-webkit2-greeter
+pcmanfm              # Mod+e file manager
+wmctrl               # X11 inspection/automation helper
+xdotool              # X11 automation and Plank helpers
+zenity               # graphical file chooser used by walltheme

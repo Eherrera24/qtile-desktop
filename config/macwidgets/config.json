@@ -1,0 +1,87 @@
+{
+  "anchor": "top-left",
+  "offset_x": 28,
+  "offset_y": 28,
+  "width": 330,
+  "x": 0,
+  "y": 0,
+  "custom_position": false,
+  "scale": 1.6,
+  "opacity": 0.35,
+  "clock_style": "stacked",
+  "calendar_style": "monthly",
+  "weather_location": "Guatemala",
+  "custom_text": "Tu espacio, a tu manera.",
+  "widget_order": [
+    "clock",
+    "calendar",
+    "system",
+    "weather",
+    "battery",
+    "date",
+    "year_progress",
+    "quote",
+    "storage"
+  ],
+  "widget_geometry": {
+    "battery": {
+      "x": 1581,
+      "y": 79,
+      "width": 330,
+      "height": 187
+    },
+    "clock": {
+      "x": 12,
+      "y": 62,
+      "width": 270,
+      "height": 270
+    },
+    "calendar": {
+      "x": 297,
+      "y": 61,
+      "width": 271,
+      "height": 271
+    },
+    "system": {
+      "x": 831,
+      "y": 126,
+      "width": 330,
+      "height": 149
+    },
+    "weather": {
+      "x": 19,
+      "y": 376,
+      "width": 363,
+      "height": 121
+    },
+    "date": {
+      "x": 1569,
+      "y": 278,
+      "width": 330,
+      "height": 288
+    },
+    "year_progress": {
+      "x": 1583,
+      "y": 31,
+      "width": 330,
+      "height": 230
+    },
+    "storage": {
+      "x": 796,
+      "y": 79,
+      "width": 330,
+      "height": 185
+    }
+  },
+  "widgets": {
+    "clock": true,
+    "calendar": true,
+    "weather": false,
+    "system": false,
+    "battery": false,
+    "date": false,
+    "year_progress": false,
+    "quote": false,
+    "storage": false
+  }
+}
