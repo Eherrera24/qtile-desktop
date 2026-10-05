@@ -19,3 +19,6 @@ Important runtime relationships:
 - Nerd Fonts render bar glyphs. Rofi additionally asks for FiraCode Nerd Font,
   which was referenced but not detected by `fc-list`; install it if glyph/text
   fallback is undesirable.
+- Fish uses Fastfetch, LSD and user-local `terminaltexteffects==0.15.0` for its
+  customised prompt/greeting. Btop and Cava have versioned visual configs;
+  Htop and Ranger are included as optional showcase tools.

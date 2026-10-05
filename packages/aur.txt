@@ -3,3 +3,4 @@ plank-reloaded-git
 
 # Installed in ~/.local with pip (not an AUR package)
 # qtile-extras==0.35.0
+# terminaltexteffects==0.15.0

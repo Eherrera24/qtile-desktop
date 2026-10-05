@@ -10,6 +10,9 @@
 | `plank-qtile` | Adapted `.desktop` launchers | If a matching window exists, changes to its group and focuses it; otherwise executes its launcher. |
 | `plank-qtile-sync` | `Mod+Ctrl+r` | Adapts selected Plank `.desktop` launchers to use `plank-qtile`, retaining backups outside this repo. |
 | `macwidgets` | Qtile autostart and hooks | Wrapper around the GTK desktop-widget program: start/stop/restart/show/hide/configure/edit. |
+| `rotate` | Manual / `autorotate` | Rotates the `eDP-1` output and synchronises the ELAN touchscreen matrix, restoring it if Xrandr fails. |
+| `autorotate` | Manual | Watches `monitor-sensor` and calls `rotate`; supports `on`, `off`, `status` and `foreground`. |
+| `firefox` | Desktop launchers / `PATH` | Enables native XInput2 touchscreen handling before executing the system Firefox binary. |
 
 Examples:
 
@@ -20,7 +23,11 @@ wifi-menu --list
 bluetooth-menu --list
 desktop-profile status
 walltheme
+autorotate status
 ```
 
 `walltheme`, `animation-profile`, `desktop-profile` and `plank-qtile-sync` modify
 live configuration; read their code before using them on another machine.
+The stored profile trees used by `desktop-profile` are deliberately excluded:
+they are 37 MB of historical duplicates, backups and unlicensed wallpaper
+assets rather than active configuration.

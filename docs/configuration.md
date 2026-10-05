@@ -9,10 +9,13 @@ Copied active files only:
 - MacWidgets code and current non-secret geometry/preferences.
 - Plank dconf snapshot (launcher definitions themselves are excluded).
 - LightDM WebKit greeter configuration, without the wallpaper asset.
+- Fish prompt/volume function, Fastfetch, Btop and Cava visual settings.
 
 Not copied: backups, experimental Wayland configs, test modules, Python caches,
 browser profiles, application histories, full icon/theme trees, launcher files
 that embed local web-app profile paths, and wallpapers of unknown provenance.
+Htop and Ranger have no user configuration files on the audited machine, so
+their screenshots intentionally use upstream defaults inside themed Kitty.
 
 Several source files contain `/home/esteban` because that is the audited source
 of truth. The installer replaces that exact prefix with the target `$HOME` in

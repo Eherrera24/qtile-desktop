@@ -28,7 +28,7 @@ echo "Mode: $($DRY_RUN && echo dry-run || echo install)"
 if ((${#missing[@]})); then
   printf 'Missing commands: %s\n' "${missing[*]}"
 fi
-echo "Targets: ~/.config/{qtile,picom,rofi,kitty,gtk-3.0,macwidgets} and selected ~/.local/bin scripts"
+echo "Targets: selected desktop configs, Fish files and ~/.local/bin scripts"
 
 if $DRY_RUN; then
   echo "Dry run complete: no files or directories were changed."
@@ -50,7 +50,7 @@ backup_and_copy() {
   cp -a -- "$source" "$destination"
 }
 
-for name in qtile picom rofi kitty gtk-3.0 macwidgets; do
+for name in qtile picom rofi kitty gtk-3.0 macwidgets btop cava fastfetch; do
   backup_and_copy "$ROOT/config/$name" "$HOME/.config/$name"
 done
 # Preserve local wallpaper assets when upgrading an existing installation.
@@ -58,6 +58,9 @@ if [[ -d "$backup_root/.config/qtile/workspace-wallpapers" ]]; then
   cp -a -- "$backup_root/.config/qtile/workspace-wallpapers" "$HOME/.config/qtile/"
 fi
 backup_and_copy "$ROOT/themes/rofi/squared-nord.rasi" "$HOME/.local/share/rofi/themes/squared-nord.rasi"
+backup_and_copy "$ROOT/config/fish/config.fish" "$HOME/.config/fish/config.fish"
+backup_and_copy "$ROOT/config/fish/info_fetch.py" "$HOME/.config/fish/info_fetch.py"
+backup_and_copy "$ROOT/config/fish/functions/volume.fish" "$HOME/.config/fish/functions/volume.fish"
 
 installed_scripts=()
 for item in \
@@ -66,6 +69,9 @@ for item in \
   scripts/utilities/bluetooth-menu \
   scripts/utilities/wifi-menu \
   scripts/utilities/desktop-profile \
+  scripts/utilities/autorotate \
+  scripts/utilities/rotate \
+  scripts/utilities/firefox \
   scripts/plank/plank-qtile \
   scripts/plank/plank-qtile-sync \
   scripts/qtile/macwidgets; do
@@ -76,7 +82,7 @@ done
 
 # Port the audited absolute home path in the newly installed copies only.
 find "$HOME/.config/qtile" "$HOME/.config/rofi" "$HOME/.config/picom" \
-  "$HOME/.config/kitty" "$HOME/.config/macwidgets" \
+  "$HOME/.config/kitty" "$HOME/.config/macwidgets" "$HOME/.config/fish" \
   -maxdepth 8 -type f -exec sed -i "s|/home/esteban|$HOME|g" {} +
 sed -i "s|/home/esteban|$HOME|g" "${installed_scripts[@]}"
 

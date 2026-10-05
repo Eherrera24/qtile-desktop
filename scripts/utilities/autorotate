@@ -1,0 +1,215 @@
+#!/bin/sh
+
+runtime_base=${XDG_RUNTIME_DIR:-/tmp}
+state_dir="$runtime_base/autorotate-$(id -u)"
+pid_file="$state_dir/pid"
+orientation_file="$state_dir/orientation"
+sensor_fifo="$state_dir/sensor"
+rotate_cmd="$HOME/.local/bin/rotate"
+self="$HOME/.local/bin/autorotate"
+sensor_pid=''
+
+usage() {
+    echo "Uso: autorotate {on|off|status|foreground}" >&2
+}
+
+process_start() {
+    awk '{print $22}' "/proc/$1/stat" 2>/dev/null
+}
+
+is_running() {
+    [ -r "$pid_file" ] || return 1
+    read -r saved_pid saved_start < "$pid_file"
+    [ -n "$saved_pid" ] && [ -n "$saved_start" ] || return 1
+    case "$saved_pid:$saved_start" in
+        *[!0-9:]*|:*) return 1 ;;
+    esac
+    [ -d "/proc/$saved_pid" ] || return 1
+    [ "$(process_start "$saved_pid")" = "$saved_start" ] || return 1
+    kill -0 "$saved_pid" 2>/dev/null
+}
+
+remove_stale_state() {
+    rm -f "$sensor_fifo" "$orientation_file" "$pid_file"
+    rmdir "$state_dir" 2>/dev/null || true
+}
+
+cleanup() {
+    if [ -n "$sensor_pid" ]; then
+        kill "$sensor_pid" 2>/dev/null || true
+        wait "$sensor_pid" 2>/dev/null || true
+    fi
+    if [ -r "$pid_file" ]; then
+        read -r owner_pid owner_start < "$pid_file"
+        if [ "$owner_pid" = "$$" ] && [ "$owner_start" = "$(process_start $$)" ]; then
+            remove_stale_state
+        fi
+    fi
+}
+
+check_requirements() {
+    if ! command -v monitor-sensor >/dev/null 2>&1; then
+        echo "Error: monitor-sensor no está instalado." >&2
+        return 1
+    fi
+    if [ ! -x "$rotate_cmd" ]; then
+        echo "Error: no se encontró el comando rotate." >&2
+        return 1
+    fi
+    if [ ! -d "$runtime_base" ] || [ ! -w "$runtime_base" ]; then
+        echo "Error: el directorio temporal no está disponible." >&2
+        return 1
+    fi
+}
+
+run_monitor() {
+    mode=$1
+    umask 077
+
+    if ! mkdir "$state_dir" 2>/dev/null; then
+        if is_running; then
+            echo "Error: la autorrotación ya está activa." >&2
+            return 1
+        fi
+        remove_stale_state
+        if ! mkdir "$state_dir" 2>/dev/null; then
+            echo "Error: no se pudo crear el estado temporal." >&2
+            return 1
+        fi
+    fi
+
+    start=$(process_start $$)
+    printf '%s %s\n' "$$" "$start" > "$pid_file"
+    trap cleanup EXIT
+    trap 'exit 0' HUP INT TERM
+    mkfifo "$sensor_fifo" || return 1
+
+    monitor-sensor --accel > "$sensor_fifo" 2>&1 &
+    sensor_pid=$!
+    last_orientation=''
+
+    [ "$mode" = foreground ] && echo "Autorrotación en primer plano."
+
+    while IFS= read -r line; do
+        detected=''
+        case "$line" in
+            *'Accelerometer orientation changed: '*)
+                detected=${line##*Accelerometer orientation changed: }
+                ;;
+            *'Has accelerometer (orientation: '*)
+                detected=${line#*orientation: }
+                detected=${detected%%,*}
+                ;;
+            *)
+                continue
+                ;;
+        esac
+
+        case "$detected" in
+            normal)    target=normal ;;
+            left-up)   target=left ;;
+            right-up)  target=right ;;
+            bottom-up) target=inverted ;;
+            *) continue ;;
+        esac
+
+        [ "$detected" = "$last_orientation" ] && continue
+        last_orientation=$detected
+        printf '%s\n' "$detected" > "$orientation_file"
+
+        if [ "$mode" = foreground ]; then
+            echo "Orientación detectada: $detected"
+            echo "Acción: rotate $target"
+        fi
+
+        if ! "$rotate_cmd" "$target" && [ "$mode" = foreground ]; then
+            echo "Error: rotate $target falló." >&2
+        fi
+    done < "$sensor_fifo"
+
+    wait "$sensor_pid" 2>/dev/null
+    sensor_status=$?
+    sensor_pid=''
+    [ "$mode" = foreground ] && echo "monitor-sensor terminó con estado $sensor_status." >&2
+    return "$sensor_status"
+}
+
+check_requirements || exit 1
+
+case "${1-}" in
+    on)
+        [ "$#" -eq 1 ] || { usage; exit 2; }
+        if is_running; then
+            read -r running_pid _ < "$pid_file"
+            echo "Autorrotación: ya está activa (PID $running_pid)."
+            exit 0
+        fi
+        remove_stale_state
+        "$self" _run >/dev/null 2>&1 &
+        launched_pid=$!
+        attempts=0
+        while [ "$attempts" -lt 20 ]; do
+            if is_running; then
+                read -r running_pid _ < "$pid_file"
+                echo "Autorrotación: activa (PID $running_pid)."
+                exit 0
+            fi
+            kill -0 "$launched_pid" 2>/dev/null || break
+            attempts=$((attempts + 1))
+            sleep 0.05
+        done
+        echo "Error: no se pudo iniciar la autorrotación." >&2
+        exit 1
+        ;;
+    off)
+        [ "$#" -eq 1 ] || { usage; exit 2; }
+        if ! is_running; then
+            remove_stale_state
+            echo "Autorrotación: inactiva."
+            exit 0
+        fi
+        read -r running_pid _ < "$pid_file"
+        kill "$running_pid" || exit 1
+        attempts=0
+        while kill -0 "$running_pid" 2>/dev/null && [ "$attempts" -lt 40 ]; do
+            attempts=$((attempts + 1))
+            sleep 0.05
+        done
+        if kill -0 "$running_pid" 2>/dev/null; then
+            echo "Error: no se pudo detener la autorrotación." >&2
+            exit 1
+        fi
+        remove_stale_state
+        echo "Autorrotación: inactiva."
+        ;;
+    status)
+        [ "$#" -eq 1 ] || { usage; exit 2; }
+        if ! is_running; then
+            remove_stale_state
+            echo "Autorrotación: inactiva."
+            exit 0
+        fi
+        read -r running_pid _ < "$pid_file"
+        echo "Autorrotación: activa"
+        echo "PID: $running_pid"
+        if [ -r "$orientation_file" ]; then
+            echo "Orientación física: $(cat "$orientation_file")"
+        else
+            echo "Orientación física: esperando sensor"
+        fi
+        screen_orientation=$($rotate_cmd status 2>/dev/null | awk -F': ' '/^Orientación:/ {print $2; exit}')
+        echo "Orientación de pantalla: ${screen_orientation:-no disponible}"
+        ;;
+    foreground)
+        [ "$#" -eq 1 ] || { usage; exit 2; }
+        run_monitor foreground
+        ;;
+    _run)
+        [ "$#" -eq 1 ] || exit 2
+        run_monitor background
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac

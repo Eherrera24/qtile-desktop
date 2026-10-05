@@ -20,22 +20,41 @@ MacWidgets appear on empty workspaces.
 |---|---|
 | ![Rofi](assets/screenshots/rofi.png) | ![Kitty](assets/screenshots/terminal.png) |
 
+<details>
+<summary><strong>Terminal showcase — Htop, Ranger and Btop</strong></summary>
+<br>
+
+| Htop | Ranger |
+|---|---|
+| <img src="assets/screenshots/terminal/htop.png" alt="Htop in transparent Kitty" width="480"> | <img src="assets/screenshots/terminal/ranger.png" alt="Ranger in transparent Kitty" width="480"> |
+
+<p align="center">
+  <img src="assets/screenshots/terminal/btop.png" alt="Btop system monitor with private panels hidden" width="760">
+</p>
+
+</details>
+
 ### Workspaces
 
 The groups use identical layouts and controls; wallpaper and palette are the
-intentional differences.
+intentional differences. The gallery stays collapsed by default so it does not
+overwhelm the project page.
 
-| Workspace | Screenshot | Description |
+<details>
+<summary><strong>Open the complete nine-workspace gallery</strong></summary>
+<br>
+
+| I | II | III |
 |---|---|---|
-| I | [View](assets/screenshots/workspaces/workspace-I.png) | Blue/sand palette |
-| II | [View](assets/screenshots/workspaces/workspace-II.png) | Green/orange palette |
-| III | [View](assets/screenshots/workspaces/workspace-III.png) | Blue/brown palette |
-| IV | [View](assets/screenshots/workspaces/workspace-IV.png) | Violet/pink palette |
-| V | [View](assets/screenshots/workspaces/workspace-V.png) | Blue/red palette |
-| VI | [View](assets/screenshots/workspaces/workspace-VI.png) | Navy/red palette |
-| VII | [View](assets/screenshots/workspaces/workspace-VII.png) | Green palette |
-| VIII | [View](assets/screenshots/workspaces/workspace-VIII.png) | Blue/rust palette |
-| IX | [View](assets/screenshots/workspaces/workspace-IX.png) | Brown/green palette |
+| <a href="assets/screenshots/workspaces/workspace-I.png"><img src="assets/screenshots/workspaces/workspace-I.png" alt="Workspace I" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-II.png"><img src="assets/screenshots/workspaces/workspace-II.png" alt="Workspace II" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-III.png"><img src="assets/screenshots/workspaces/workspace-III.png" alt="Workspace III" width="300"></a> |
+| **IV** | **V** | **VI** |
+| <a href="assets/screenshots/workspaces/workspace-IV.png"><img src="assets/screenshots/workspaces/workspace-IV.png" alt="Workspace IV" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-V.png"><img src="assets/screenshots/workspaces/workspace-V.png" alt="Workspace V" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-VI.png"><img src="assets/screenshots/workspaces/workspace-VI.png" alt="Workspace VI" width="300"></a> |
+| **VII** | **VIII** | **IX** |
+| <a href="assets/screenshots/workspaces/workspace-VII.png"><img src="assets/screenshots/workspaces/workspace-VII.png" alt="Workspace VII" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-VIII.png"><img src="assets/screenshots/workspaces/workspace-VIII.png" alt="Workspace VIII" width="300"></a> | <a href="assets/screenshots/workspaces/workspace-IX.png"><img src="assets/screenshots/workspaces/workspace-IX.png" alt="Workspace IX" width="300"></a> |
+
+Click any thumbnail to open the full 1920×1200 capture.
+
+</details>
 
 ## Features
 
@@ -47,7 +66,9 @@ intentional differences.
 - Picom Dual Kawase blur, shadows, rounded corners and selectable animations
 - Rofi app launcher plus custom Wi-Fi and Bluetooth menus
 - Transparent Kitty setup and intelligent-hiding Plank dock
+- Custom Fish prompt, Fastfetch greeting, Btop and Cava terminal styling
 - Qtile/Plank focus integration and hover-aware layout margins
+- Touchscreen/manual autorotation helpers for X11
 - Desktop widgets automatically hidden when a workspace has application windows
 
 ## Components
@@ -65,6 +86,7 @@ intentional differences.
 | Screenshots | Scrot 2.0.0 |
 | Notifications | Dunst / libnotify |
 | Desktop widgets | Custom GTK 3 MacWidgets |
+| Terminal tools | Fish, Fastfetch, Htop, Ranger, Btop, Cava |
 
 ## Installation
 
@@ -109,7 +131,7 @@ The complete extracted list is in [docs/keybindings.md](docs/keybindings.md).
 ## Project structure
 
 ```text
-config/     active application configuration snapshots
+config/     active desktop and terminal-tool configuration snapshots
 scripts/    wallpaper, Plank, Qtile and utility scripts
 themes/     externally referenced Rofi theme
 assets/     sanitized screenshots; wallpaper licensing note

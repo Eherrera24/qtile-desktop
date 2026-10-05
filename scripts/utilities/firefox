@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Enable Firefox's native XInput2 touchscreen handling under X11.
+export MOZ_USE_XINPUT2=1
+
+exec /usr/bin/firefox "$@"
